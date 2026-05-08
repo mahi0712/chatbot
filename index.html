@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Voice Chatbot</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(135deg, #ece9e6, #ffffff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .box {
+            width: 400px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        button {
+            margin-top: 10px;
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .mic {
+            background: #ff9800;
+            color: white;
+        }
+
+        .send {
+            background: #4caf50;
+            color: white;
+            float: right;
+        }
+
+        .chat {
+            margin-top: 20px;
+            background: #f7f7f7;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 100px;
+        }
+
+        .label {
+            font-size: 12px;
+            color: gray;
+        }
+
+        .text {
+            margin: 5px 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>🤖 AI Chatbot</h2>
+
+    <!-- INPUT -->
+    <input type="text" id="textBox" placeholder="Type or speak...">
+
+    <!-- BUTTONS -->
+    <button class="mic" onclick="startVoice()">🎤 Mic</button>
+    <button class="send" onclick="sendText()">Send</button>
+
+    <!-- CHAT AREA -->
+    <div class="chat">
+
+        <div class="label">You</div>
+        <div class="text" id="userText">---</div>
+
+        <div class="label">Bot</div>
+        <div class="text" id="botText">---</div>
+
+    </div>
+
+</div>
+
+<script>
+// ❗ SAME JS (NO CHANGE)
+
+function startVoice() {
+
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+    recognition.lang = "en-US";
+    recognition.start();
+
+    recognition.onresult = function(event) {
+
+        let text = event.results[0][0].transcript;
+
+        document.getElementById("textBox").value = text;
+    };
+}
+
+function sendText() {
+
+    let text = document.getElementById("textBox").value;
+
+    document.getElementById("userText").innerText = text;
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ text: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("botText").innerText = data.reply;
+    });
+}
+
+</script>
+
+</body>
+</html>
